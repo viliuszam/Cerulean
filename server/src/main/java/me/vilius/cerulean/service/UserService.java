@@ -23,8 +23,8 @@ public class UserService {
 
     public User registerUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(Role.USER);
         user.setSignupDate(LocalDateTime.now());
+        user.setRole(Role.USER);
         return userRepository.save(user);
     }
 

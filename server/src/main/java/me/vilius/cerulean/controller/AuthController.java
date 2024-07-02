@@ -3,6 +3,7 @@ package me.vilius.cerulean.controller;
 import me.vilius.cerulean.controller.dto.ErrorResponse;
 import me.vilius.cerulean.controller.dto.JwtResponse;
 import me.vilius.cerulean.controller.dto.LoginRequest;
+import me.vilius.cerulean.controller.dto.SignupRequest;
 import me.vilius.cerulean.model.User;
 import me.vilius.cerulean.service.UserService;
 import me.vilius.cerulean.util.JwtUtil;
@@ -49,16 +50,20 @@ public class AuthController {
         }
     }
 
-    //TODO: make it so that registering logs you in, also create a signup DTO
+    //TODO: make it so that registering logs you in
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody User user) {
-        if (userService.findByUsername(user.getUsername()) != null) {
+    public ResponseEntity<String> signup(@RequestBody SignupRequest signupRequest) {
+        if (userService.findByUsername(signupRequest.getUsername()) != null) {
             return ResponseEntity.badRequest().body("Username is already taken");
         }
-        if (userService.findByEmail(user.getEmail()) != null) {
+        if (userService.findByEmail(signupRequest.getEmail()) != null) {
             return ResponseEntity.badRequest().body("Email is already registered");
         }
-        userService.registerUser(user);
+        if(signupRequest.getRealName() == null || signupRequest.getEmail() == null ||
+        signupRequest.getUsername() == null || signupRequest.getPassword() == null){
+            return ResponseEntity.badRequest().body("Missing data in signup request");
+        }
+        userService.registerUser(signupRequest.toUser());
         return ResponseEntity.ok("User registered successfully");
     }
 
