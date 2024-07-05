@@ -1,15 +1,15 @@
-// src/pages/LoginPage.js
-import React from 'react';
+import React, { useContext } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Icon } from '@iconify/react';
 import userIcon from '@iconify/icons-mdi/account';
 import lockIcon from '@iconify/icons-mdi/lock';
 import heartIcon from '@iconify/icons-mdi/heart';
 import cartIcon from '@iconify/icons-mdi/cart';
+import { AuthContext } from '../context/AuthContext';
 
 const Container = styled.div`
     display: flex;
@@ -63,6 +63,7 @@ const StyledField = styled(Field)`
 const ErrorText = styled.div`
     color: red;
     font-size: 0.8rem;
+    margin-top: 0.5rem;
 `;
 
 const StyledButton = styled.button`
@@ -87,6 +88,9 @@ const StyledButton = styled.button`
 `;
 
 const LoginPage = () => {
+    const { login } = useContext(AuthContext);
+    const navigate = useNavigate();
+
     const initialValues = {
         username: '',
         password: ''
@@ -97,12 +101,21 @@ const LoginPage = () => {
         password: Yup.string().required('Password is required')
     });
 
-    const onSubmit = async (values, { setSubmitting, setFieldError }) => {
+    const onSubmit = async (values, { setSubmitting, setStatus }) => {
         try {
             const response = await axios.post('http://localhost:8080/api/auth/login', values);
-            console.log(response.data); // Handle login success (e.g., save the token, redirect)
+            const token = response.data.token;
+            const userResponse = await axios.get('http://localhost:8080/api/auth/user', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            login(token, userResponse.data);
+            navigate('/dashboard');
         } catch (error) {
-            setFieldError('password', 'Invalid username or password');
+            if (error.response && error.response.data) {
+                setStatus({ error: error.response.data });
+            } else {
+                setStatus({ error: { message: 'An unknown error occurred' } });
+            }
         }
         setSubmitting(false);
     };
@@ -113,8 +126,14 @@ const LoginPage = () => {
                 <Title>
                     Log in to Cerulean <Icon icon={heartIcon} color="#007acc" width="24" height="24" /> <Icon icon={cartIcon} color="#007acc" width="24" height="24" />
                 </Title>
-                <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit} validateOnBlur={false} validateOnChange={false}>
-                    {({ isSubmitting }) => (
+                <Formik
+                    initialValues={initialValues}
+                    validationSchema={validationSchema}
+                    onSubmit={onSubmit}
+                    validateOnBlur={false}
+                    validateOnChange={false}
+                >
+                    {({ isSubmitting, status }) => (
                         <Form>
                             <InputField>
                                 <Icon icon={userIcon} width="20" height="20" />
@@ -127,8 +146,9 @@ const LoginPage = () => {
                             </InputField>
                             <ErrorMessage name="password" component={ErrorText} />
                             <StyledButton type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? 'Logging in...' : 'Login'}
+                                {isSubmitting ? 'Logging in...' : 'Log In'}
                             </StyledButton>
+                            {status && status.error && <ErrorText>{status.error.message}</ErrorText>}
                         </Form>
                     )}
                 </Formik>

@@ -19,6 +19,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -33,6 +35,19 @@ public class AuthController {
     public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<?> getUserInfo(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated");
+        }
+        User user = userService.findByUsername(principal.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        // TODO: exclude sensitive info from the response
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/login")
@@ -50,7 +65,6 @@ public class AuthController {
         }
     }
 
-    //TODO: make it so that registering logs you in
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody SignupRequest signupRequest) {
         if (userService.findByUsername(signupRequest.getUsername()) != null) {
