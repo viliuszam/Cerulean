@@ -51,6 +51,7 @@ const UserInfo = styled.div`
     align-items: center;
 `;
 
+// TODO: this ugly thing fix it
 const LogoutButton = styled.button`
     background: transparent; /* Match the background with the navbar */
     border: 1px solid white; /* Add a border to make it look like a button */

@@ -1,8 +1,10 @@
 package me.vilius.cerulean.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -21,6 +23,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -30,6 +33,12 @@ public class User {
 
     @Column(nullable = false)
     private LocalDateTime signupDate;
+
+    @OneToMany(mappedBy = "seller")
+    private List<Auction> auctions;
+
+    @OneToMany(mappedBy = "seller")
+    private List<UserRating> receivedRatings;
 
     public Long getId() {
         return id;
@@ -85,5 +94,21 @@ public class User {
 
     public void setSignupDate(LocalDateTime signupDate) {
         this.signupDate = signupDate;
+    }
+
+    public List<Auction> getAuctions() {
+        return auctions;
+    }
+
+    public void setAuctions(List<Auction> auctions) {
+        this.auctions = auctions;
+    }
+
+    public List<UserRating> getReceivedRatings() {
+        return receivedRatings;
+    }
+
+    public void setReceivedRatings(List<UserRating> receivedRatings) {
+        this.receivedRatings = receivedRatings;
     }
 }

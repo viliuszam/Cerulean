@@ -46,7 +46,6 @@ public class AuthController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
-        // TODO: exclude sensitive info from the response
         return ResponseEntity.ok(user);
     }
 
