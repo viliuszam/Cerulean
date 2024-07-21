@@ -1,6 +1,6 @@
 import React from 'react';
-import Navbar from '../components/Navbar';
 import styled from 'styled-components';
+import PageWithNavbar from '../components/PageWithNavbar';
 
 const Container = styled.div`
     padding: 2rem;
@@ -9,11 +9,12 @@ const Container = styled.div`
 const DashboardPage = () => {
     return (
         <>
-            <Navbar />
+        <PageWithNavbar>
             <Container>
                 <h1>Welcome to the Dashboard</h1>
                 {/* stuff */}
             </Container>
+        </PageWithNavbar>
         </>
     );
 };

@@ -1,0 +1,95 @@
+.create-auction-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 60px);
+    padding: 20px;
+}
+
+.form-container {
+    border-radius: 15px;
+    background-color: #f7f9fc;
+    width: 100%;
+    max-width: 600px;
+    border: 1px solid #d0e4f7;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+    padding: 30px;
+}
+
+.form-container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-group {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    text-align: left;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #d0e4f7;
+}
+
+.description-field {
+    height: 150px;
+    resize: none;
+}
+
+.text-danger {
+    color: red;
+    text-align: left;
+    margin-top: 5px;
+}
+
+.btn-primary {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-primary svg {
+    margin-right: 10px;
+}
+
+.react-datepicker-wrapper,
+.react-datepicker__input-container,
+.react-datepicker__input-container input {
+    display: block;
+    width: 100%;
+}
+
+.react-datepicker__input-container input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #d0e4f7;
+}

@@ -4,6 +4,7 @@ import { AuthProvider, AuthContext } from './context/AuthContext';
 import SignupPage from './pages/SignupPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import AuctionCreationPage from './pages/CreateAuctionPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
@@ -22,6 +23,7 @@ const App = () => {
                         </AuthContext.Consumer>
                     } />
                     <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+                    <Route path="/auctions/create" element={<ProtectedRoute><AuctionCreationPage /></ProtectedRoute>} />
                     <Route path="/" element={<Navigate to="/dashboard" />} />
                 </Routes>
             </Router>

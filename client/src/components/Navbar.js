@@ -13,10 +13,15 @@ const NavbarContainer = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 1rem; /* Slimmer padding */
+    padding: 0.5rem 1rem;
     background-color: #007acc;
     color: white;
-    flex-wrap: wrap; /* Make it responsive */
+    flex-wrap: wrap;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 `;
 
 const NavLeft = styled.div`

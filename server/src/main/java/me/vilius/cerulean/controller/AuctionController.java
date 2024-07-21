@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -28,15 +29,16 @@ public class AuctionController {
     @Autowired
     private UserService userService;
 
+
+    // TODO: some kind of nesting problem? test later
     @PostMapping("/create")
     public ResponseEntity<?> createAuction(
             Principal principal,
             @RequestParam String itemName,
             @RequestParam String description,
             @RequestParam double startingPrice,
-            @RequestParam String startDate,
             @RequestParam String endDate,
-            @RequestParam("images") List<MultipartFile> images,
+            @RequestParam(name = "images", required = false) List<MultipartFile> images,
             @RequestParam(required = false) Double buyItNowPrice,
             @RequestParam(required = false) Double reservePrice) throws IOException {
 
@@ -48,11 +50,11 @@ public class AuctionController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
-        LocalDateTime start = LocalDateTime.parse(startDate);
-        LocalDateTime end = LocalDateTime.parse(endDate);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime end = LocalDateTime.parse(endDate, formatter);
 
         try {
-            Auction auction = auctionService.createAuction(user.getId(), itemName, description, startingPrice, start, end, images, buyItNowPrice, reservePrice);
+            Auction auction = auctionService.createAuction(user.getId(), itemName, description, startingPrice, end, images, buyItNowPrice, reservePrice);
             AuctionResponse auctionResponseDTO = auctionService.convertToDto(auction);
             return ResponseEntity.ok(auctionResponseDTO);
         } catch (IllegalArgumentException e) {

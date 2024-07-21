@@ -35,7 +35,7 @@ public class AuctionService {
     private String uploadDir;
 
     public Auction createAuction(Long userId, String itemName, String description, double startingPrice,
-                                 LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> images,
+                                 LocalDateTime endDate, List<MultipartFile> images,
                                  Double buyItNowPrice, Double reservePrice) throws IOException {
         User seller = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -52,7 +52,7 @@ public class AuctionService {
         auction.setItemName(itemName);
         auction.setDescription(description);
         auction.setStartingBid(startingPrice);
-        auction.setStartDate(startDate);
+        auction.setStartDate(LocalDateTime.now());
         auction.setEndDate(endDate);
         auction.setCurrentBid(0D);
 
@@ -63,9 +63,11 @@ public class AuctionService {
             auction.setReservePrice(reservePrice);
         }
 
-        for (MultipartFile image : images) {
-            String imageUrl = uploadImage(image);
-            auction.getImageUrls().add(imageUrl);
+        if(images != null){
+            for (MultipartFile image : images) {
+                String imageUrl = uploadImage(image);
+                auction.getImageUrls().add(imageUrl);
+            }
         }
 
         return auctionRepository.save(auction);
