@@ -7,8 +7,12 @@ import me.vilius.cerulean.model.User;
 import me.vilius.cerulean.model.UserRating;
 import me.vilius.cerulean.repository.AuctionRepository;
 import me.vilius.cerulean.repository.UserRepository;
+import me.vilius.cerulean.util.ConversionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,6 +77,13 @@ public class AuctionService {
         return auctionRepository.save(auction);
     }
 
+    // old and bad
+    public Page<AuctionResponse> getAuctions(String username, AuctionStatus status, String itemName, Pageable pageable) {
+        User seller = username != null ? userRepository.findByUsername(username).orElse(null) : null;
+        Page<Auction> auctions = auctionRepository.findAllBySellerOrStatusOrItemNameContaining(seller, status, itemName, pageable);
+        return auctions.map(ConversionUtil::convertAuctionToDto);
+    }
+
     // TODO: maybe move this out to utility class
     private String uploadImage(MultipartFile image) throws IOException {
         String uniqueFilename = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
@@ -87,28 +98,5 @@ public class AuctionService {
         Files.write(filePath, image.getBytes());
 
         return filePath.toString();
-    }
-
-    public AuctionResponse convertToDto(Auction auction) {
-        AuctionResponse dto = new AuctionResponse();
-        dto.setId(auction.getId());
-        dto.setItemName(auction.getItemName());
-        dto.setDescription(auction.getDescription());
-        dto.setStartingPrice(auction.getStartingBid());
-        dto.setStartDate(auction.getStartDate());
-        dto.setEndDate(auction.getEndDate());
-        dto.setImageUrls(auction.getImageUrls());
-        dto.setBuyItNowPrice(auction.getBuyItNowPrice());
-        dto.setReservePrice(auction.getReservePrice());
-
-        User seller = auction.getSeller();
-        dto.setSellerName(seller.getUsername());
-        dto.setSellerSignupDate(seller.getSignupDate());
-
-        List<UserRating> ratings = seller.getReceivedRatings();
-        OptionalDouble averageRating = ratings.stream().mapToInt(UserRating::getRating).average();
-        dto.setSellerAverageRating(averageRating.isPresent() ? averageRating.getAsDouble() : 0.0);
-
-        return dto;
     }
 }

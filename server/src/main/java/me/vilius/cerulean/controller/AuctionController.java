@@ -2,11 +2,15 @@ package me.vilius.cerulean.controller;
 
 import me.vilius.cerulean.controller.dto.AuctionResponse;
 import me.vilius.cerulean.model.Auction;
+import me.vilius.cerulean.model.AuctionStatus;
 import me.vilius.cerulean.model.User;
 import me.vilius.cerulean.repository.UserRepository;
 import me.vilius.cerulean.service.AuctionService;
 import me.vilius.cerulean.service.UserService;
+import me.vilius.cerulean.util.ConversionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -29,6 +33,17 @@ public class AuctionController {
     @Autowired
     private UserService userService;
 
+    // TODO: add categories to auction items
+    @GetMapping("")
+    public Page<AuctionResponse> getAuctions(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) AuctionStatus status,
+            @RequestParam(required = false) String itemName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return auctionService.getAuctions(username, status, itemName, pageRequest);
+    }
 
     // TODO: some kind of nesting problem? test later
     @PostMapping("/create")
@@ -55,7 +70,7 @@ public class AuctionController {
 
         try {
             Auction auction = auctionService.createAuction(user.getId(), itemName, description, startingPrice, end, images, buyItNowPrice, reservePrice);
-            AuctionResponse auctionResponseDTO = auctionService.convertToDto(auction);
+            AuctionResponse auctionResponseDTO = ConversionUtil.convertAuctionToDto(auction);
             return ResponseEntity.ok(auctionResponseDTO);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

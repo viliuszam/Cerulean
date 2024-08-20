@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AuctionCreationPage from './pages/CreateAuctionPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import AuctionsIndexPage from './pages/AuctionsIndexPage';
 
 const App = () => {
     return (
@@ -24,6 +25,7 @@ const App = () => {
                     } />
                     <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
                     <Route path="/auctions/create" element={<ProtectedRoute><AuctionCreationPage /></ProtectedRoute>} />
+                    <Route path="/auctions" element={<ProtectedRoute><AuctionsIndexPage /></ProtectedRoute>} />
                     <Route path="/" element={<Navigate to="/dashboard" />} />
                 </Routes>
             </Router>

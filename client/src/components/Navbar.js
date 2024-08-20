@@ -105,7 +105,7 @@ const Navbar = () => {
                     <Icon icon={heartIcon} color="#ffffff" width="24" height="24" />
                     <Icon icon={cartIcon} color="#ffffff" width="24" height="24" />
                 </Brand>
-                <NavItem to="/dashboard">
+                <NavItem to="/auctions">
                     <Icon icon={homeIcon} width="24" height="24" />
                     Auctions
                 </NavItem>
