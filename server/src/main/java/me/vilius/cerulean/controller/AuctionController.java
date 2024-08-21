@@ -45,6 +45,12 @@ public class AuctionController {
         return auctionService.getAuctions(username, status, itemName, pageRequest);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<AuctionResponse> getAuctionById(@PathVariable Long id) {
+        AuctionResponse auctionResponse = auctionService.getAuctionById(id);
+        return auctionResponse != null ? ResponseEntity.ok(auctionResponse) : ResponseEntity.notFound().build();
+    }
+
     // TODO: some kind of nesting problem? test later
     @PostMapping("/create")
     public ResponseEntity<?> createAuction(

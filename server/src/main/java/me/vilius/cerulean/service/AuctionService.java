@@ -77,6 +77,11 @@ public class AuctionService {
         return auctionRepository.save(auction);
     }
 
+    public AuctionResponse getAuctionById(Long id) {
+        Auction auction = auctionRepository.findById(id).orElse(null);
+        return auction != null ? ConversionUtil.convertAuctionToDto(auction) : null;
+    }
+
     // old and bad
     public Page<AuctionResponse> getAuctions(String username, AuctionStatus status, String itemName, Pageable pageable) {
         User seller = username != null ? userRepository.findByUsername(username).orElse(null) : null;
