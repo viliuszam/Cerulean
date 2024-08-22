@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import PageWithNavbar from '../components/PageWithNavbar';
-import { FaCircle, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { FaCircle, FaArrowLeft, FaArrowRight, FaTag, FaGavel, FaShoppingCart, FaLock, FaClock, FaCalendarAlt } from 'react-icons/fa';
 import './AuctionDetailPage.css';
 import Popup from '../components/Popup';
 
@@ -76,16 +76,16 @@ const AuctionDetailPage = () => {
         setPopupVisible(false);
     };
 
-    const getStatusIcon = (status) => {
+    const getStatusColor = (status) => {
         switch (status) {
             case 'IN_PROGRESS':
-                return <FaCircle style={{ color: 'green' }} title="In Progress" />;
+                return 'green';
             case 'FINISHED':
-                return <FaCircle style={{ color: 'blue' }} title="Finished" />;
+                return 'blue';
             case 'CANCELED':
-                return <FaCircle style={{ color: 'red' }} title="Canceled" />;
+                return 'red';
             default:
-                return <FaCircle style={{ color: 'gray' }} title="Unknown Status" />;
+                return 'gray';
         }
     };
 
@@ -122,105 +122,102 @@ const AuctionDetailPage = () => {
 
     return (
         <PageWithNavbar>
-            <div className="container auction-detail mt-4">
-                <div className="row justify-content-center">
-                    <div className="col-md-6">
-                        <div className="auction-gallery">
-                            {auction.imageUrls.length > 0 && (
-                                <div className="gallery-container">
-                                    {auction.imageUrls.length > 1 && (
-                                        <>
-                                            <FaArrowLeft
-                                                className="gallery-arrow"
-                                                onClick={handlePrevImage}
-                                            />
-                                            <FaArrowRight
-                                                className="gallery-arrow"
-                                                onClick={handleNextImage}
-                                            />
-                                        </>
-                                    )}
-                                    <img
-                                        src={`http://localhost:8080/${auction.imageUrls[currentImageIndex]}`}
-                                        alt={`Auction item ${currentImageIndex + 1}`}
-                                        className="img-fluid auction-image"
-                                    />
-                                    <div className="image-counter">
-                                        Image {currentImageIndex + 1} of {auction.imageUrls.length}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    <div className="col-md-6">
-                        <h2>{auction.itemName}</h2>
-                        <p className="text-muted">
-                            Seller: {auction.sellerName} (Joined: {new Date(auction.sellerSignupDate).toLocaleDateString()}) - Rating: {auction.sellerAverageRating.toFixed(1)}/5
-                        </p>
-                        <p>{auction.description}</p>
-                        <p className="lead"><strong>Starting Price:</strong> ${auction.startingPrice.toFixed(2)}</p>
-                        <p className="lead"><strong>Current Highest Bid:</strong> ${highestBid.toFixed(2)}</p>
-                        <p><strong>Buy It Now Price:</strong> ${auction.buyItNowPrice.toFixed(2)}</p>
-                        <p>
-                            <strong>Reserve Price:</strong> {auction.reservePrice !== null ? `$${auction.reservePrice.toFixed(2)}` : 'No reserve price set'}
-                        </p>
-                        <p style={{ textTransform: 'capitalize' }}>
-                            <strong>Status:</strong> {getStatusIcon(auction.status)} {auction.status.replace('_', ' ').toLowerCase()}
-                        </p>
-                        <p><strong>Start Date:</strong> {new Date(auction.startDate).toLocaleDateString()}</p>
-                        <p><strong>End Date:</strong> {new Date(auction.endDate).toLocaleDateString()}</p>
-                        
-                        <div className={`bid-section ${isBiddingDisabled ? 'disabled' : ''}`}>
-                            {isBiddingDisabled ? (
-                                <p className="text-danger">{biddingMessage}</p>
-                            ) : (
-                                <>
-                                    <h4>Place Your Bid</h4>
-                                    <form onSubmit={handleBidSubmit}>
-                                        <div className="form-group">
-                                            <label>Bid Amount</label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                min={highestBid + 1}
-                                                value={bidAmount}
-                                                onChange={(e) => setBidAmount(e.target.value)}
-                                                placeholder={`Minimum $${(highestBid + 1).toFixed(2)}`}
-                                                required
-                                                disabled={isBiddingDisabled}
-                                            />
-                                        </div>
-                                        <div className="form-check mb-3">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                checked={agreementChecked}
-                                                onChange={() => setAgreementChecked(!agreementChecked)}
-                                                id="agreeCheckbox"
-                                            />
-                                            <label className="form-check-label" htmlFor="agreeCheckbox">
-                                                I agree to be obligated to pay if I win this auction.
-                                            </label>
-                                        </div>
-                                        <button type="submit" className="btn btn-primary" disabled={isBiddingDisabled}>Place Bid</button>
-                                    </form>
-                                </>
-                            )}
-                        </div>
-
-                        <div className="bids-list mt-4">
-                            <h4>Bid History</h4>
-                            <div className="bid-history-container">
-                                {auction.bids.length > 0 ? (
-                                    auction.bids.map((bid, index) => (
-                                        <div key={index} className="bid-entry">
-                                            <strong>${bid.amount.toFixed(2)}</strong> by {bid.bidderUsername} at {new Date(bid.timestamp).toLocaleString()}
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p>No bids have been placed yet.</p>
+            <div className="auction-detail-container">
+                <div className="auction-info-section">
+                    <div className="auction-gallery">
+                        {auction.imageUrls.length > 0 && (
+                            <div className="gallery-container">
+                                {auction.imageUrls.length > 1 && (
+                                    <>
+                                        <FaArrowLeft
+                                            className="gallery-arrow"
+                                            onClick={handlePrevImage}
+                                        />
+                                        <FaArrowRight
+                                            className="gallery-arrow"
+                                            onClick={handleNextImage}
+                                        />
+                                    </>
                                 )}
+                                <img
+                                    src={`http://localhost:8080/${auction.imageUrls[currentImageIndex]}`}
+                                    alt={`Auction item ${currentImageIndex + 1}`}
+                                    className="img-fluid auction-image"
+                                />
+                                <div className="image-counter">
+                                    Image {currentImageIndex + 1} of {auction.imageUrls.length}
+                                </div>
                             </div>
+                        )}
+                    </div>
+                    <h2>{auction.itemName}</h2>
+                    <p className="text-muted">
+                        Seller: {auction.sellerName} (Joined: {new Date(auction.sellerSignupDate).toLocaleDateString()}) - Rating: {auction.sellerAverageRating.toFixed(1)}/5
+                    </p>
+                    <p>{auction.description}</p>
+                    <div className="auction-details">
+                        <p><FaTag /> <strong>Starting Price:</strong> &nbsp;${auction.startingPrice.toFixed(2)}</p>
+                        <p><FaGavel /> <strong>Current Highest Bid:</strong> &nbsp;${highestBid.toFixed(2)}</p>
+                        <p><FaShoppingCart /> <strong>Buy It Now Price:</strong> &nbsp;${auction.buyItNowPrice.toFixed(2)}</p>
+                        <p><FaLock /> <strong>Reserve Price:</strong> &nbsp;{auction.reservePrice !== null ? `$${auction.reservePrice.toFixed(2)}` : 'No reserve price set'}</p>
+                        <p>
+                            <FaCircle style={{ color: getStatusColor(auction.status) }} /> 
+                            <strong>Status:</strong> &nbsp;{auction.status.replace('_', ' ').toLowerCase().replace(/^\w/, c => c.toUpperCase())}
+                        </p>
+                        <p><FaCalendarAlt /> <strong>Start Date:</strong> &nbsp;{new Date(auction.startDate).toLocaleDateString()}</p>
+                        <p><FaClock /> <strong>End Date:</strong> &nbsp;{new Date(auction.endDate).toLocaleDateString()}</p>
+                    </div>
+                </div>
+                <div className="bidding-section">
+                    <div className={`bid-form ${isBiddingDisabled ? 'disabled' : ''}`}>
+                        {isBiddingDisabled ? (
+                            <p className="text-danger">{biddingMessage}</p>
+                        ) : (
+                            <>
+                                <h4>Place Your Bid</h4>
+                                <form onSubmit={handleBidSubmit}>
+                                    <div className="form-group">
+                                        <label>Bid Amount</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            min={highestBid + 1}
+                                            value={bidAmount}
+                                            onChange={(e) => setBidAmount(e.target.value)}
+                                            placeholder={`Minimum $${(highestBid + 1).toFixed(2)}`}
+                                            required
+                                            disabled={isBiddingDisabled}
+                                        />
+                                    </div>
+                                    <div className="form-check mb-3">
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            checked={agreementChecked}
+                                            onChange={() => setAgreementChecked(!agreementChecked)}
+                                            id="agreeCheckbox"
+                                        />
+                                        <label className="form-check-label" htmlFor="agreeCheckbox">
+                                            I agree to be obligated to pay if I win this auction.
+                                        </label>
+                                    </div>
+                                    <button type="submit" className="btn btn-primary" disabled={isBiddingDisabled}>Place Bid</button>
+                                </form>
+                            </>
+                        )}
+                    </div>
+                    <div className="bids-list">
+                        <h4>Bid History</h4>
+                        <div className="bid-history-container">
+                            {auction.bids.length > 0 ? (
+                                auction.bids.map((bid, index) => (
+                                    <div key={index} className="bid-entry">
+                                        <strong>${bid.amount.toFixed(2)}</strong> by {bid.bidderUsername} at {new Date(bid.timestamp).toLocaleString()}
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No bids have been placed yet.</p>
+                            )}
                         </div>
                     </div>
                 </div>

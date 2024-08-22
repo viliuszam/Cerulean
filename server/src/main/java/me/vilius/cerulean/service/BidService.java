@@ -52,7 +52,7 @@ public class BidService {
             return new BidResponse(false, "Your bid must be higher than the current highest bid of $" + highestBid.get().getAmount());
         }
 
-        if (auction.getBuyItNowPrice() != null && bidRequest.getAmount() >= auction.getBuyItNowPrice()) {
+        if (auction.getBuyItNowPrice() != null && bidRequest.getAmount() > auction.getBuyItNowPrice()) {
             return new BidResponse(false, "Your bid exceeds the Buy It Now price of $" + auction.getBuyItNowPrice());
         }
 
