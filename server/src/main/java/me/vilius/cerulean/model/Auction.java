@@ -1,5 +1,6 @@
 package me.vilius.cerulean.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class Auction {
     @Column(nullable = false)
     private Double currentBid;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;

@@ -1,11 +1,10 @@
 package me.vilius.cerulean.service;
 
 import me.vilius.cerulean.controller.dto.AuctionResponse;
-import me.vilius.cerulean.model.Auction;
-import me.vilius.cerulean.model.AuctionStatus;
-import me.vilius.cerulean.model.User;
-import me.vilius.cerulean.model.UserRating;
+import me.vilius.cerulean.controller.dto.MyBidsResponse;
+import me.vilius.cerulean.model.*;
 import me.vilius.cerulean.repository.AuctionRepository;
+import me.vilius.cerulean.repository.BidRepository;
 import me.vilius.cerulean.repository.UserRepository;
 import me.vilius.cerulean.util.ConversionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AuctionService {
@@ -34,6 +34,9 @@ public class AuctionService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BidRepository bidRepository;
 
     @Value("${image.upload.dir}")
     private String uploadDir;
@@ -75,6 +78,51 @@ public class AuctionService {
         }
 
         return auctionRepository.save(auction);
+    }
+
+    public List<MyBidsResponse> getUserBids(User user) {
+        List<Bid> userBids = bidRepository.findAllByBidder(user);
+
+        return userBids.stream()
+                .collect(Collectors.groupingBy(Bid::getAuction))
+                .entrySet()
+                .stream()
+                .map(entry -> {
+                    Auction auction = entry.getKey();
+                    List<Bid> bids = entry.getValue();
+                    Double userBidAmount = bids.stream().mapToDouble(Bid::getAmount).max().orElse(0);
+
+                    Double highestBid = auction.getBids().stream().mapToDouble(Bid::getAmount).max().orElse(0);
+
+                    String userBidStatus = determineBidStatus(userBidAmount, highestBid, auction);
+
+                    MyBidsResponse response = new MyBidsResponse();
+                    response.setAuctionId(auction.getId());
+                    response.setItemName(auction.getItemName());
+                    response.setDescription(auction.getDescription());
+                    response.setEndDate(auction.getEndDate());
+                    response.setHighestBid(highestBid);
+                    response.setUserBidAmount(userBidAmount);
+                    response.setUserBidStatus(userBidStatus);
+                    response.setImageUrls(auction.getImageUrls());
+                    response.setAuctionEnded(auction.getEndDate().isBefore(LocalDateTime.now()));
+
+                    return response;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private String determineBidStatus(Double userBidAmount, Double highestBid, Auction auction) {
+        // this could also be inferred from the status? (status only updates once a minute however)
+        if (auction.getEndDate().isBefore(LocalDateTime.now())) {
+            if (userBidAmount.equals(highestBid)) {
+                return "WON";
+            } else {
+                return "LOST";
+            }
+        } else {
+            return userBidAmount.equals(highestBid) ? "TOP_BIDDER" : "OUTBID";
+        }
     }
 
     public AuctionResponse getAuctionById(Long id) {
