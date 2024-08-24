@@ -34,6 +34,7 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime signupDate;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "seller")
     private List<Auction> auctions;
 

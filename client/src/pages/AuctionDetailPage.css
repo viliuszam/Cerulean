@@ -136,6 +136,21 @@
     padding-bottom: 0;
 }
 
+.countdown-timer {
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.countdown-text {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 5px;
+    color: #007bff;
+}
+
 @media (max-width: 768px) {
     .auction-detail-container {
         flex-direction: column;

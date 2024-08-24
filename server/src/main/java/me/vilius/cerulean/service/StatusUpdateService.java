@@ -17,6 +17,9 @@ public class StatusUpdateService {
     @Autowired
     private AuctionRepository auctionRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void updateAuctionStatuses() {
@@ -25,6 +28,9 @@ public class StatusUpdateService {
 
         for (Auction auction : expiredAuctions) {
             auction.setStatus(AuctionStatus.FINISHED);
+            // notify users the auction has ended
+            auction.getBids().forEach(bid ->
+                    notificationService.sendAuctionEndedNotification(bid.getBidder().getId(), auction.getId()));
             auctionRepository.save(auction);
         }
     }

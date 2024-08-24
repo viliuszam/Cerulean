@@ -7,6 +7,7 @@ import me.vilius.cerulean.model.Bid;
 import me.vilius.cerulean.model.User;
 import me.vilius.cerulean.model.UserRating;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalDouble;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class ConversionUtil {
 
-    public static AuctionResponse convertAuctionToDto(Auction auction) {
+    public static AuctionResponse convertAuctionToDto(Auction auction, Long userId) {
         AuctionResponse dto = new AuctionResponse();
         dto.setId(auction.getId());
         dto.setItemName(auction.getItemName());
@@ -31,7 +32,7 @@ public class ConversionUtil {
         dto.setSellerName(seller.getUsername());
         dto.setSellerSignupDate(seller.getSignupDate());
 
-        List<BidDto> bidDtos = auction.getBids().stream()
+        List<BidDto> bidDtos = auction.getBids() == null ? new ArrayList() : auction.getBids().stream()
                 .sorted(Comparator.comparingDouble(Bid::getAmount).reversed())
                 .map(bid -> new BidDto(
                         bid.getAmount(),
@@ -44,6 +45,32 @@ public class ConversionUtil {
         List<UserRating> ratings = seller.getReceivedRatings();
         OptionalDouble averageRating = ratings.stream().mapToInt(UserRating::getRating).average();
         dto.setSellerAverageRating(averageRating.isPresent() ? averageRating.getAsDouble() : 0.0);
+
+        if (userId != null) {
+            List<Bid> userBids = auction.getBids().stream()
+                    .filter(bid -> bid.getBidder().getId().equals(userId))
+                    .collect(Collectors.toList());
+
+            if(auction.getSeller().getId().equals(userId)){
+                dto.setUserBidStatus("SELLER");
+            }else{
+                if (userBids.isEmpty()) {
+                    dto.setUserBidStatus("NO_BID");
+                } else {
+                    Bid highestBid = auction.getBids().stream()
+                            .max(Comparator.comparingDouble(Bid::getAmount))
+                            .orElse(null);
+
+                    if (highestBid != null && highestBid.getBidder().getId().equals(userId)) {
+                        dto.setUserBidStatus("TOP_BIDDER");
+                    } else {
+                        dto.setUserBidStatus("HAS_BID");
+                    }
+                }
+            }
+        } else {
+            dto.setUserBidStatus("NO_BID");
+        }
 
         return dto;
     }

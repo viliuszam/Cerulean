@@ -2,6 +2,7 @@ package me.vilius.cerulean.service;
 
 import me.vilius.cerulean.controller.dto.BidRequest;
 import me.vilius.cerulean.controller.dto.BidResponse;
+import me.vilius.cerulean.controller.dto.NotificationMessage;
 import me.vilius.cerulean.model.Auction;
 import me.vilius.cerulean.model.AuctionStatus;
 import me.vilius.cerulean.model.Bid;
@@ -26,6 +27,9 @@ public class BidService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     public BidResponse placeBid(Long auctionId, User user, BidRequest bidRequest) {
         Auction auction = auctionRepository.findById(auctionId)
@@ -68,6 +72,13 @@ public class BidService {
         bid.setTimestamp(LocalDateTime.now());
 
         Bid savedBid = bidRepository.save(bid);
+
+        // Notify last bidder
+        if(lastBid.isPresent()){
+            User bidder = lastBid.get().getBidder();
+            notificationService.sendOutbidNotification(bidder.getId(), auctionId,
+                    auction.getItemName(), bid.getAmount());
+        }
 
         return new BidResponse(true, "Bid placed successfully.", savedBid);
     }

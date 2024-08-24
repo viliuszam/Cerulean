@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
+import { WebSocketProvider } from './context/WebSocketContext';
 import SignupPage from './pages/SignupPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
@@ -12,6 +13,7 @@ import AuctionDetailPage from './pages/AuctionDetailPage';
 
 const App = () => {
     return (
+        <WebSocketProvider>
         <AuthProvider>
             <Router>
                 <Routes>
@@ -34,6 +36,7 @@ const App = () => {
                 </Routes>
             </Router>
         </AuthProvider>
+        </WebSocketProvider>
     );
 };
 

@@ -35,19 +35,34 @@ public class AuctionController {
 
     // TODO: add categories to auction items
     @GetMapping("")
-    public Page<AuctionResponse> getAuctions(
+    public ResponseEntity<?> getAuctions(
             @RequestParam(required = false) String username,
             @RequestParam(required = false) AuctionStatus status,
             @RequestParam(required = false) String itemName,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size
+            , Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        User user = userService.findByUsername(principal.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
         PageRequest pageRequest = PageRequest.of(page, size);
-        return auctionService.getAuctions(username, status, itemName, pageRequest);
+        return ResponseEntity.ok(auctionService.getAuctions(username, status, itemName, pageRequest, user));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AuctionResponse> getAuctionById(@PathVariable Long id) {
-        AuctionResponse auctionResponse = auctionService.getAuctionById(id);
+    public ResponseEntity<?> getAuctionById(@PathVariable Long id, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated");
+        }
+        User user = userService.findByUsername(principal.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        AuctionResponse auctionResponse = auctionService.getAuctionById(id, user.getId());
         return auctionResponse != null ? ResponseEntity.ok(auctionResponse) : ResponseEntity.notFound().build();
     }
 
@@ -76,7 +91,7 @@ public class AuctionController {
 
         try {
             Auction auction = auctionService.createAuction(user.getId(), itemName, description, startingPrice, end, images, buyItNowPrice, reservePrice);
-            AuctionResponse auctionResponseDTO = ConversionUtil.convertAuctionToDto(auction);
+            AuctionResponse auctionResponseDTO = ConversionUtil.convertAuctionToDto(auction, user.getId());
             return ResponseEntity.ok(auctionResponseDTO);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

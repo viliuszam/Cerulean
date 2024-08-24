@@ -1,11 +1,13 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useWebSocket } from './WebSocketContext';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const { connect, disconnect } = useWebSocket();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -14,6 +16,7 @@ export const AuthProvider = ({ children }) => {
                 headers: { Authorization: `Bearer ${token}` }
             }).then(response => {
                 setUser(response.data);
+                connect();
                 setLoading(false);
             }).catch(() => {
                 setLoading(false);
@@ -25,11 +28,13 @@ export const AuthProvider = ({ children }) => {
 
     const login = (token, userData) => {
         localStorage.setItem('token', token);
+        connect();
         setUser(userData);
     };
 
     const logout = () => {
         localStorage.removeItem('token');
+        disconnect();
         setUser(null);
     };
 

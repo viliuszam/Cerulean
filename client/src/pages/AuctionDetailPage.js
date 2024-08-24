@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import PageWithNavbar from '../components/PageWithNavbar';
-import { FaCircle, FaArrowLeft, FaArrowRight, FaTag, FaGavel, FaShoppingCart, FaLock, FaClock, FaCalendarAlt } from 'react-icons/fa';
+import { FaCircle, FaArrowLeft, FaArrowRight, FaTag, FaGavel, FaShoppingCart, FaLock, FaClock, FaCalendarAlt, FaUser, FaCrown, FaExclamationCircle, FaStore, FaHourglassHalf } from 'react-icons/fa';
 import './AuctionDetailPage.css';
 import Popup from '../components/Popup';
 
@@ -15,10 +15,40 @@ const AuctionDetailPage = () => {
     const [popupMessage, setPopupMessage] = useState('');
     const [popupSuccess, setPopupSuccess] = useState(false);
     const [agreementChecked, setAgreementChecked] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(null);
+    const [auctionEnded, setAuctionEnded] = useState(false);
 
     useEffect(() => {
         fetchAuction();
     }, [id]);
+
+    useEffect(() => {
+        if (auction) {
+            const calculateTimeLeft = () => {
+                const now = new Date().getTime();
+                const endTime = new Date(auction.endDate).getTime();
+                const difference = endTime - now;
+
+                if (difference > 0) {
+                    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+                    setTimeLeft({ days, hours, minutes, seconds });
+                    setAuctionEnded(false);
+                } else {
+                    setTimeLeft(null);
+                    setAuctionEnded(true);
+                }
+            };
+
+            calculateTimeLeft();
+            const timer = setInterval(calculateTimeLeft, 1000);
+
+            return () => clearInterval(timer);
+        }
+    }, [auction]);
 
     const fetchAuction = async () => {
         try {
@@ -101,6 +131,38 @@ const AuctionDetailPage = () => {
         );
     };
 
+    const getBidStatusInfo = (status) => {
+        switch (status) {
+            case 'HAS_BID':
+                return { message: 'You have been outbid', icon: <FaExclamationCircle /> };
+            case 'TOP_BIDDER':
+                return { message: 'You are the top bidder', icon: <FaCrown /> };
+            case 'NO_BID':
+                return { message: 'You have not placed a bid', icon: <FaUser /> };
+            case 'SELLER':
+                return { message: 'You are the seller of this auction', icon: <FaStore /> };
+            default:
+                return { message: 'Unknown bid status', icon: <FaCircle /> };
+        }
+    };
+
+    const isBiddingDisabled = () => {
+        return auction.status === 'FINISHED' || 
+               auction.status === 'CANCELED' || 
+               auction.userBidStatus === 'SELLER';
+    };
+
+    const getBiddingMessage = () => {
+        if (auction.status === 'FINISHED') {
+            return 'This auction has ended. Bidding is closed.';
+        } else if (auction.status === 'CANCELED') {
+            return 'This auction has been canceled. Bidding is closed.';
+        } else if (auction.userBidStatus === 'SELLER') {
+            return 'You cannot bid on your own auction.';
+        }
+        return '';
+    };
+
     if (!auction) {
         return (
             <PageWithNavbar>
@@ -110,13 +172,6 @@ const AuctionDetailPage = () => {
             </PageWithNavbar>
         );
     }
-
-    const isBiddingDisabled = auction.status === 'FINISHED' || auction.status === 'CANCELED';
-    const biddingMessage = isBiddingDisabled
-        ? auction.status === 'FINISHED'
-            ? 'This auction has ended. Bidding is closed.'
-            : 'This auction has been canceled. Bidding is closed.'
-        : '';
 
     const highestBid = auction.bids.length > 0 ? auction.bids[0].amount : auction.startingPrice;
 
@@ -142,7 +197,7 @@ const AuctionDetailPage = () => {
                                 <img
                                     src={`http://localhost:8080/${auction.imageUrls[currentImageIndex]}`}
                                     alt={`Auction item ${currentImageIndex + 1}`}
-                                    className="img-fluid auction-image"
+                                    className="auction-image"
                                 />
                                 <div className="image-counter">
                                     Image {currentImageIndex + 1} of {auction.imageUrls.length}
@@ -166,12 +221,40 @@ const AuctionDetailPage = () => {
                         </p>
                         <p><FaCalendarAlt /> <strong>Start Date:</strong> &nbsp;{new Date(auction.startDate).toLocaleDateString()}</p>
                         <p><FaClock /> <strong>End Date:</strong> &nbsp;{new Date(auction.endDate).toLocaleDateString()}</p>
+                        <div className="countdown-timer">
+                            <div className="countdown-label">
+                                <FaHourglassHalf /> <strong>Time Left:</strong>
+                            </div>
+                            <div className="countdown-text">
+                                {auction ? (
+                                    auctionEnded ? (
+                                        "Auction has ended"
+                                    ) : timeLeft ? (
+                                        `${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`
+                                    ) : (
+                                        "Calculating time remaining..."
+                                    )
+                                ) : (
+                                    "Loading auction details..."
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className="bidding-section">
-                    <div className={`bid-form ${isBiddingDisabled ? 'disabled' : ''}`}>
-                        {isBiddingDisabled ? (
-                            <p className="text-danger">{biddingMessage}</p>
+                    <div className="user-bid-status">
+                        {(() => {
+                            const { message, icon } = getBidStatusInfo(auction.userBidStatus);
+                            return (
+                                <p>
+                                    {icon} &nbsp;{message}
+                                </p>
+                            );
+                        })()}
+                    </div>
+                    <div className={`bid-form ${isBiddingDisabled() ? 'disabled' : ''}`}>
+                        {isBiddingDisabled() ? (
+                            <p className="text-danger">{getBiddingMessage()}</p>
                         ) : (
                             <>
                                 <h4>Place Your Bid</h4>
@@ -186,7 +269,7 @@ const AuctionDetailPage = () => {
                                             onChange={(e) => setBidAmount(e.target.value)}
                                             placeholder={`Minimum $${(highestBid + 1).toFixed(2)}`}
                                             required
-                                            disabled={isBiddingDisabled}
+                                            disabled={isBiddingDisabled()}
                                         />
                                     </div>
                                     <div className="form-check mb-3">
@@ -201,7 +284,7 @@ const AuctionDetailPage = () => {
                                             I agree to be obligated to pay if I win this auction.
                                         </label>
                                     </div>
-                                    <button type="submit" className="btn btn-primary" disabled={isBiddingDisabled}>Place Bid</button>
+                                    <button type="submit" className="btn btn-primary" disabled={isBiddingDisabled()}>Place Bid</button>
                                 </form>
                             </>
                         )}

@@ -1,7 +1,6 @@
 package me.vilius.cerulean.controller.dto;
 
 import me.vilius.cerulean.model.AuctionStatus;
-import me.vilius.cerulean.model.Bid;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +19,15 @@ public class AuctionResponse {
     private LocalDateTime sellerSignupDate;
     private double sellerAverageRating;
     private List<BidDto> bids;
+    private String userBidStatus;
+
+    public String getUserBidStatus() {
+        return userBidStatus;
+    }
+
+    public void setUserBidStatus(String userBidStatus) {
+        this.userBidStatus = userBidStatus;
+    }
 
     public List<BidDto> getBids() {
         return bids;

@@ -125,16 +125,17 @@ public class AuctionService {
         }
     }
 
-    public AuctionResponse getAuctionById(Long id) {
+    public AuctionResponse getAuctionById(Long id, Long userId) {
         Auction auction = auctionRepository.findById(id).orElse(null);
-        return auction != null ? ConversionUtil.convertAuctionToDto(auction) : null;
+        return auction != null ? ConversionUtil.convertAuctionToDto(auction, userId) : null;
     }
 
     // old and bad
-    public Page<AuctionResponse> getAuctions(String username, AuctionStatus status, String itemName, Pageable pageable) {
+    public Page<AuctionResponse> getAuctions(String username, AuctionStatus status,
+                                             String itemName, Pageable pageable, User user) {
         User seller = username != null ? userRepository.findByUsername(username).orElse(null) : null;
         Page<Auction> auctions = auctionRepository.findAllBySellerOrStatusOrItemNameContaining(seller, status, itemName, pageable);
-        return auctions.map(ConversionUtil::convertAuctionToDto);
+        return auctions.map(auction -> ConversionUtil.convertAuctionToDto(auction, user.getId()));
     }
 
     // TODO: maybe move this out to utility class
