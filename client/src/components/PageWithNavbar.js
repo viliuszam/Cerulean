@@ -6,10 +6,10 @@ const PageWithNavbar = ({ children }) => {
   return (
     <>
       <Navbar />
-      <Notification />
       <div className="content-with-navbar">
         {children}
       </div>
+      <Notification />
     </>
   );
 };

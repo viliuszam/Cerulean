@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import PageWithNavbar from '../components/PageWithNavbar';
 import { FaTrophy, FaArrowDown, FaCheck, FaTimes } from 'react-icons/fa';
+import { useWebSocket } from '../context/WebSocketContext';
 
 const MyBidsPage = () => {
     const [bids, setBids] = useState([]);
     const navigate = useNavigate();
+    const { refreshAuctionData } = useWebSocket();
 
-    useEffect(() => {
-        fetchUserBids();
-    }, []);
-
-    const fetchUserBids = async () => {
+    const fetchUserBids = useCallback(async () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:8080/api/bids/me', {
@@ -25,7 +23,24 @@ const MyBidsPage = () => {
         } catch (error) {
             console.error('Error fetching user bids:', error);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchUserBids();
+    }, [fetchUserBids]);
+
+    useEffect(() => {
+        const handleAuctionUpdate = async (event) => {
+            const updatedAuctionId = event.detail;
+            await fetchUserBids();
+        };
+
+        window.addEventListener('auctionUpdate', handleAuctionUpdate);
+
+        return () => {
+            window.removeEventListener('auctionUpdate', handleAuctionUpdate);
+        };
+    }, [fetchUserBids]);
 
     const handleRowClick = (auctionId) => {
         navigate(`/auction/${auctionId}`);

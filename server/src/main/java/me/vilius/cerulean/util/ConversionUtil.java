@@ -47,13 +47,13 @@ public class ConversionUtil {
         dto.setSellerAverageRating(averageRating.isPresent() ? averageRating.getAsDouble() : 0.0);
 
         if (userId != null) {
-            List<Bid> userBids = auction.getBids().stream()
-                    .filter(bid -> bid.getBidder().getId().equals(userId))
-                    .collect(Collectors.toList());
-
             if(auction.getSeller().getId().equals(userId)){
                 dto.setUserBidStatus("SELLER");
             }else{
+                List<Bid> userBids = auction.getBids().stream()
+                        .filter(bid -> bid.getBidder().getId().equals(userId))
+                        .collect(Collectors.toList());
+
                 if (userBids.isEmpty()) {
                     dto.setUserBidStatus("NO_BID");
                 } else {

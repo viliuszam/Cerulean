@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import PageWithNavbar from '../components/PageWithNavbar';
-import { FaCircle, FaArrowLeft, FaArrowRight, FaTag, FaGavel, FaShoppingCart, FaLock, FaClock, FaCalendarAlt, FaUser, FaCrown, FaExclamationCircle, FaStore, FaHourglassHalf } from 'react-icons/fa';
+import { FaCircle, FaArrowLeft, FaArrowRight, FaTag, FaGavel, FaShoppingCart, FaLock, FaClock, FaCalendarAlt, FaUser, FaCrown, FaExclamationCircle, FaStore, FaHourglassHalf, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import './AuctionDetailPage.css';
 import Popup from '../components/Popup';
+import { useWebSocket } from '../context/WebSocketContext';
 
 const AuctionDetailPage = () => {
     const { id } = useParams();
     const [auction, setAuction] = useState(null);
+    const { refreshAuctionData } = useWebSocket();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [bidAmount, setBidAmount] = useState('');
     const [popupVisible, setPopupVisible] = useState(false);
@@ -17,10 +19,52 @@ const AuctionDetailPage = () => {
     const [agreementChecked, setAgreementChecked] = useState(false);
     const [timeLeft, setTimeLeft] = useState(null);
     const [auctionEnded, setAuctionEnded] = useState(false);
+    const [currentBidPage, setCurrentBidPage] = useState(1);
+    const bidsPerPage = 5;
+
+    const fetchAuction = useCallback(async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`http://localhost:8080/api/auctions/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            //console.log('Fetched auction data:', response.data);
+            setAuction(response.data);
+            setBidAmount('');
+            setAgreementChecked(false);
+        } catch (error) {
+            console.error('Error fetching auction:', error);
+        }
+    }, [id]);
 
     useEffect(() => {
+        //console.log('Initial fetch of auction data');
         fetchAuction();
-    }, [id]);
+    }, [fetchAuction]);
+
+    useEffect(() => {
+        const handleAuctionUpdate = async (event) => {
+            //console.log('Received auctionUpdate event:', event.detail);
+            if (event.detail === id) {
+                //console.log('Updating auction data for ID:', id);
+                await fetchAuction();
+            }
+        };
+
+        //console.log('Adding auctionUpdate event listener');
+        window.addEventListener('auctionUpdate', handleAuctionUpdate);
+
+        return () => {
+            //console.log('Removing auctionUpdate event listener');
+            window.removeEventListener('auctionUpdate', handleAuctionUpdate);
+        };
+    }, [id, fetchAuction]);
+
+    useEffect(() => {
+        //console.log('Auction data updated:', auction);
+    }, [auction]);
 
     useEffect(() => {
         if (auction) {
@@ -49,20 +93,6 @@ const AuctionDetailPage = () => {
             return () => clearInterval(timer);
         }
     }, [auction]);
-
-    const fetchAuction = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:8080/api/auctions/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setAuction(response.data);
-        } catch (error) {
-            console.error('Error fetching auction:', error);
-        }
-    };
 
     const handleBidSubmit = async (event) => {
         event.preventDefault();
@@ -161,6 +191,19 @@ const AuctionDetailPage = () => {
             return 'You cannot bid on your own auction.';
         }
         return '';
+    };
+
+    const indexOfLastBid = currentBidPage * bidsPerPage;
+    const indexOfFirstBid = indexOfLastBid - bidsPerPage;
+    const currentBids = auction ? auction.bids.slice(indexOfFirstBid, indexOfLastBid) : [];
+    const totalBidPages = auction ? Math.ceil(auction.bids.length / bidsPerPage) : 0;
+
+    const handleNextBidPage = () => {
+        setCurrentBidPage(prev => Math.min(prev + 1, totalBidPages));
+    };
+
+    const handlePrevBidPage = () => {
+        setCurrentBidPage(prev => Math.max(prev - 1, 1));
     };
 
     if (!auction) {
@@ -292,8 +335,8 @@ const AuctionDetailPage = () => {
                     <div className="bids-list">
                         <h4>Bid History</h4>
                         <div className="bid-history-container">
-                            {auction.bids.length > 0 ? (
-                                auction.bids.map((bid, index) => (
+                            {currentBids.length > 0 ? (
+                                currentBids.map((bid, index) => (
                                     <div key={index} className="bid-entry">
                                         <strong>${bid.amount.toFixed(2)}</strong> by {bid.bidderUsername} at {new Date(bid.timestamp).toLocaleString()}
                                     </div>
@@ -302,6 +345,27 @@ const AuctionDetailPage = () => {
                                 <p>No bids have been placed yet.</p>
                             )}
                         </div>
+                        {totalBidPages > 1 && (
+                            <div className="bid-pagination">
+                                <button 
+                                    onClick={handlePrevBidPage} 
+                                    disabled={currentBidPage === 1}
+                                    className="btn btn-sm btn-outline-secondary"
+                                >
+                                    <FaChevronLeft />
+                                </button>
+                                <span className="mx-2">
+                                    Page {currentBidPage} of {totalBidPages}
+                                </span>
+                                <button 
+                                    onClick={handleNextBidPage} 
+                                    disabled={currentBidPage === totalBidPages}
+                                    className="btn btn-sm btn-outline-secondary"
+                                >
+                                    <FaChevronRight />
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

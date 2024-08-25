@@ -23,21 +23,21 @@ const WebSocketManager = {
       stompClient.connect(
         { Authorization: `Bearer ${token}` },
         (frame) => {
-          console.log('Connected: ' + frame);
-          isConnected = true; // Update the connection status
+          //console.log('Connected: ' + frame);
+          isConnected = true;
           onConnected(stompClient);
           
-          // Ensure subscription happens only after connection is established
           stompClient.subscribe('/user/topic/notifications', (notification) => {
-            console.log('Received notification:', notification);
-            onMessageReceived(JSON.parse(notification.body));
+           // console.log('Received WebSocket notification:', notification);
+            const parsedNotification = JSON.parse(notification.body);
+            onMessageReceived(parsedNotification);
           });
 
           resolve(stompClient);
         },
         (error) => {
           console.error('STOMP error:', error);
-          isConnected = false; // Update the connection status
+          isConnected = false;
           onError(error);
           connectionPromise = null;
           reject(error);
@@ -52,7 +52,7 @@ const WebSocketManager = {
     if (stompClient && stompClient.connected) {
       stompClient.disconnect(() => {
         console.log('Disconnected');
-        isConnected = false; // Update the connection status
+        isConnected = false;
         connectionPromise = null;
         onDisconnected();
       });
