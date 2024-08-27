@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AuctionsIndexPage from './pages/AuctionsIndexPage';
 import MyBidsPage from './pages/MyBidsPage';
 import AuctionDetailPage from './pages/AuctionDetailPage';
+import DepositPage from './pages/DepositPage';
 
 const App = () => {
     return (
@@ -32,6 +33,7 @@ const App = () => {
                     <Route path="/auctions" element={<ProtectedRoute><AuctionsIndexPage /></ProtectedRoute>} />
                     <Route path="/bids" element={<ProtectedRoute><MyBidsPage /></ProtectedRoute>} />
                     <Route path="/auction/:id" element={<ProtectedRoute><AuctionDetailPage /></ProtectedRoute>} />
+                    <Route path="/deposit" element={<ProtectedRoute><DepositPage /></ProtectedRoute>} />
                     <Route path="/" element={<Navigate to="/dashboard" />} />
                 </Routes>
             </Router>

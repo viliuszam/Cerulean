@@ -8,6 +8,7 @@ import logoutIcon from '@iconify/icons-mdi/logout';
 import heartIcon from '@iconify/icons-mdi/heart';
 import cartIcon from '@iconify/icons-mdi/cart';
 import gavelIcon from '@iconify/icons-mdi/gavel';
+import walletIcon from '@iconify/icons-mdi/wallet';
 import { AuthContext } from '../context/AuthContext';
 
 const NavbarContainer = styled.div`
@@ -113,6 +114,10 @@ const Navbar = () => {
                 <NavItem to="/bids">
                     <Icon icon={gavelIcon} width="24" height="24" />
                     My Bids
+                </NavItem>
+                <NavItem to="/deposit">
+                    <Icon icon={walletIcon} width="24" height="24" />
+                    Wallet
                 </NavItem>
             </NavLeft>
             <NavRight>

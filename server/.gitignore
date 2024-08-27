@@ -6,7 +6,7 @@ build/
 !**/src/test/**/build/
 
 ## stripe key
-!**/src/main/resources/stripe.properties
+/src/main/resources/stripe.properties
 
 ### STS ###
 .apt_generated
