@@ -51,6 +51,18 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<WithdrawalRequest> withdrawalRequests;
 
+    @Column
+    private String stripeAccountId;
+
+
+    public String getStripeAccountId() {
+        return stripeAccountId;
+    }
+
+    public void setStripeAccountId(String stripeAccountId) {
+        this.stripeAccountId = stripeAccountId;
+    }
+
     public BigDecimal getBalance() {
         return balance;
     }

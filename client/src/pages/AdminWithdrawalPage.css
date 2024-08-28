@@ -1,0 +1,20 @@
+.container {
+    margin-top: 20px;
+  }
+  
+  .table {
+    margin-top: 20px;
+  }
+  
+  .table th, .table td {
+    vertical-align: middle;
+  }
+  
+  .alert {
+    margin-bottom: 20px;
+  }
+  
+  .btn {
+    margin-right: 5px;
+  }
+  

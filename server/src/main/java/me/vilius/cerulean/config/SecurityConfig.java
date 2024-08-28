@@ -70,7 +70,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/ws/**", "/uploads/**",
-                                "/api/auth/signup", "/api/auth/login", "/api/webhook/**").permitAll()
+                                "/api/auth/signup", "/api/auth/login", "/api/webhook/**"
+                        , "/api/payments/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

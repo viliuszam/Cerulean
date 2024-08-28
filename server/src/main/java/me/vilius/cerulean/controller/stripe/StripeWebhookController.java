@@ -1,4 +1,4 @@
-package me.vilius.cerulean.controller;
+package me.vilius.cerulean.controller.stripe;
 
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;

@@ -5,6 +5,7 @@ import com.stripe.model.PaymentIntent;
 import me.vilius.cerulean.model.User;
 import me.vilius.cerulean.model.WithdrawalRequest;
 import me.vilius.cerulean.service.PaymentService;
+import me.vilius.cerulean.service.StripeService;
 import me.vilius.cerulean.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,9 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @Autowired
+    private StripeService stripeService;
+
+    @Autowired
     private UserService userService;
 
     @PostMapping("/deposit")
@@ -40,7 +44,7 @@ public class PaymentController {
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
             }
-            PaymentIntent paymentIntent = paymentService.createPaymentIntent(amount, user, "eur");
+            PaymentIntent paymentIntent = stripeService.createPaymentIntent(amount, user, "eur");
             Map<String, String> responseData = new HashMap<>();
             responseData.put("clientSecret", paymentIntent.getClientSecret()); // might need source later
             return ResponseEntity.ok(responseData);

@@ -11,6 +11,9 @@ import AuctionsIndexPage from './pages/AuctionsIndexPage';
 import MyBidsPage from './pages/MyBidsPage';
 import AuctionDetailPage from './pages/AuctionDetailPage';
 import DepositPage from './pages/DepositPage';
+import WithdrawalPage from './pages/WithdrawalPage';
+import AdminWithdrawalPage from './pages/AdminWithdrawalPage';
+import AdminRoute from './components/AdminRoute';
 
 const App = () => {
     return (
@@ -34,6 +37,8 @@ const App = () => {
                     <Route path="/bids" element={<ProtectedRoute><MyBidsPage /></ProtectedRoute>} />
                     <Route path="/auction/:id" element={<ProtectedRoute><AuctionDetailPage /></ProtectedRoute>} />
                     <Route path="/deposit" element={<ProtectedRoute><DepositPage /></ProtectedRoute>} />
+                    <Route path="/withdraw" element={<ProtectedRoute><WithdrawalPage /></ProtectedRoute>} />
+                    <Route path="/admin/withdrawals" element={<AdminRoute><AdminWithdrawalPage /></AdminRoute>} />
                     <Route path="/" element={<Navigate to="/dashboard" />} />
                 </Routes>
             </Router>

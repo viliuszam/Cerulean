@@ -1,8 +1,5 @@
 package me.vilius.cerulean.service;
 
-import com.stripe.exception.StripeException;
-import com.stripe.model.PaymentIntent;
-import com.stripe.param.PaymentIntentCreateParams;
 import me.vilius.cerulean.model.Payment;
 import me.vilius.cerulean.model.User;
 import me.vilius.cerulean.model.WithdrawalRequest;
@@ -14,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class PaymentService {
@@ -27,16 +25,8 @@ public class PaymentService {
     @Autowired
     private WithdrawalRequestRepository withdrawalRequestRepository;
 
-    // TODO: perhaps store these in the database?
-    public PaymentIntent createPaymentIntent(BigDecimal amount, User user, String currency) throws StripeException {
-        PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                .setAmount(amount.multiply(BigDecimal.valueOf(100)).longValue())
-                .setCurrency(currency)
-                .putMetadata("username", user.getUsername())
-                .build();
-
-        return PaymentIntent.create(params);
-    }
+    @Autowired
+    private StripeService stripeService;
 
     public Payment createPayment(User user, BigDecimal amount, String stripePaymentIntentId, Payment.PaymentType type) {
         Payment payment = new Payment();
@@ -63,8 +53,48 @@ public class PaymentService {
         request.setAmount(amount);
         request.setRequestTime(LocalDateTime.now());
         request.setStatus(WithdrawalRequest.Status.PENDING);
+        user.setBalance(user.getBalance().subtract(request.getAmount()));
+        userRepository.save(user);
         withdrawalRequestRepository.save(request);
 
         return request;
     }
+
+    public List<WithdrawalRequest> getAllPendingRequests() {
+        return withdrawalRequestRepository.findAllByStatus(WithdrawalRequest.Status.PENDING);
+    }
+
+    public void approveWithdrawalRequest(Long requestId, String comment) throws Exception {
+        WithdrawalRequest request = withdrawalRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Withdrawal request not found"));
+
+        if (request.getStatus() != WithdrawalRequest.Status.PENDING) {
+            throw new IllegalStateException("Request is not in pending status");
+        }
+
+        String payoutId = stripeService.processPayout(request);
+
+        request.setStatus(WithdrawalRequest.Status.APPROVED);
+        request.setPayoutId(payoutId);
+        request.setAdminComment(comment);
+        withdrawalRequestRepository.save(request);
+    }
+
+    public void denyWithdrawalRequest(Long requestId, String comment) {
+        WithdrawalRequest request = withdrawalRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Withdrawal request not found"));
+
+        if (request.getStatus() != WithdrawalRequest.Status.PENDING) {
+            throw new IllegalStateException("Request is not in pending status");
+        }
+
+        User user = request.getUser();
+        // refund the user to account balance if we deny withdrawal
+        user.setBalance(user.getBalance().add(request.getAmount()));
+        userRepository.save(user);
+        request.setStatus(WithdrawalRequest.Status.DENIED);
+        request.setAdminComment(comment);
+        withdrawalRequestRepository.save(request);
+    }
+
 }

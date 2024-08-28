@@ -31,6 +31,18 @@ public class WithdrawalRequest {
 
     private String adminComment;
 
+    @Column
+    private String payoutId;
+
+
+    public String getPayoutId() {
+        return payoutId;
+    }
+
+    public void setPayoutId(String payoutId) {
+        this.payoutId = payoutId;
+    }
+
     public Long getId() {
         return id;
     }
