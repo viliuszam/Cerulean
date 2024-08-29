@@ -41,14 +41,40 @@ public class StripeConnectController {
         return ResponseEntity.ok(Collections.singletonMap("connected", isConnected));
     }
 
-    @GetMapping("/connect")
-    public ResponseEntity<String> createAccountLink(Principal principal) {
+    @GetMapping("/remove")
+    public ResponseEntity<?> removeAccountLink(Principal principal) {
         if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized.");
         }
         User user = userService.findByUsername(principal.getName());
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+        if(user.getStripeAccountId() == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Stripe account linked.");
+        }
+
+        try {
+            Account resource = Account.retrieve(user.getStripeAccountId());
+            Account account = resource.delete();
+            if(account.getDeleted()){
+                user.setStripeAccountId(null);
+                userRepository.save(user);
+            }
+            return ResponseEntity.ok(account.toJson());
+        } catch (StripeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing Stripe account: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/connect")
+    public ResponseEntity<String> createAccountLink(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized.");
+        }
+        User user = userService.findByUsername(principal.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
 
         String accountId;

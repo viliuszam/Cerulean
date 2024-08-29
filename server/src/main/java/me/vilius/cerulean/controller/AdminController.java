@@ -15,6 +15,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
+// TODO: don't use repositories directly in the controller
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {

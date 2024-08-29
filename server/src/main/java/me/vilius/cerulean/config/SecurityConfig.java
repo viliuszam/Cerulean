@@ -71,7 +71,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/ws/**", "/uploads/**",
                                 "/api/auth/signup", "/api/auth/login", "/api/webhook/**"
-                        , "/api/payments/**").permitAll()
+                        , "/api/payments/**", "/api/stripe/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

@@ -2,6 +2,7 @@ package me.vilius.cerulean.controller;
 
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
+import me.vilius.cerulean.model.Payment;
 import me.vilius.cerulean.model.User;
 import me.vilius.cerulean.model.WithdrawalRequest;
 import me.vilius.cerulean.service.PaymentService;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -74,6 +76,49 @@ public class PaymentController {
             return ResponseEntity.ok("Withdrawal request created successfully. Awaiting approval.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error creating withdrawal request: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/deposits")
+    public ResponseEntity<?> getDepositHistory(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated");
+        }
+
+        User user = userService.findByUsername(principal.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        try {
+            List<Payment> deposits = paymentService.getDepositsByUser(user);
+            if (deposits.isEmpty()) {
+                return ResponseEntity.ok("No deposits found.");
+            }
+            return ResponseEntity.ok(deposits);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving deposit history: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/withdrawal-requests")
+    public ResponseEntity<?> getWithdrawalRequestHistory(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated");
+        }
+        User user = userService.findByUsername(principal.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        try {
+            List<WithdrawalRequest> deposits = paymentService.getWithdrawalRequests(user);
+            if (deposits.isEmpty()) {
+                return ResponseEntity.ok("No withdrawal requests found.");
+            }
+            return ResponseEntity.ok(deposits);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving withdrawal request history: " + e.getMessage());
         }
     }
 

@@ -97,4 +97,12 @@ public class PaymentService {
         withdrawalRequestRepository.save(request);
     }
 
+    public List<Payment> getDepositsByUser(User user) {
+        return paymentRepository.findByUserAndType(user, Payment.PaymentType.DEPOSIT);
+    }
+
+    public List<WithdrawalRequest> getWithdrawalRequests(User user) {
+        return withdrawalRequestRepository.findByUser(user);
+    }
+
 }

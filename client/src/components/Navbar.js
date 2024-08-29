@@ -54,21 +54,20 @@ const NavRight = styled.div`
 
 const UserInfo = styled.div`
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    align-items: center; // Changed to align items horizontally
 `;
 
-// TODO: this ugly thing fix it
+// Updated to make the logout button visually consistent
 const LogoutButton = styled.button`
-    background: transparent; /* Match the background with the navbar */
-    border: 1px solid white; /* Add a border to make it look like a button */
+    background: transparent;
+    border: 1px solid white;
     color: white;
     display: flex;
     align-items: center;
     cursor: pointer;
     font-size: 1rem;
-    padding: 0.5rem 1rem; /* Symmetric padding */
-    border-radius: 5px; /* Border radius for button look */
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
 
     &:hover {
         opacity: 0.8;
@@ -88,6 +87,12 @@ const Brand = styled.div`
     & > svg {
         margin-left: 0.5rem;
     }
+`;
+
+const BalanceDisplay = styled.div`
+    margin-left: 1rem;
+    color: white;
+    font-size: 1rem;
 `;
 
 const Navbar = () => {
@@ -115,7 +120,7 @@ const Navbar = () => {
                     <Icon icon={gavelIcon} width="24" height="24" />
                     My Bids
                 </NavItem>
-                <NavItem to="/deposit">
+                <NavItem to="/wallet">
                     <Icon icon={walletIcon} width="24" height="24" />
                     Wallet
                 </NavItem>
@@ -126,6 +131,11 @@ const Navbar = () => {
                         <Icon icon={accountCircleIcon} width="24" height="24" />
                         {user ? user.realName : ''}
                     </NavItem>
+                    {user && user.balance && (
+                        <BalanceDisplay>
+                            Balance: €{user.balance.toFixed(2)}
+                        </BalanceDisplay>
+                    )}
                     <LogoutButton onClick={handleLogout}>
                         <Icon icon={logoutIcon} width="24" height="24" />
                         Logout
