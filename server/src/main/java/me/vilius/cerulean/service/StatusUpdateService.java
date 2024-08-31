@@ -3,6 +3,7 @@ package me.vilius.cerulean.service;
 import me.vilius.cerulean.model.Auction;
 import me.vilius.cerulean.model.AuctionStatus;
 import me.vilius.cerulean.model.Bid;
+import me.vilius.cerulean.model.User;
 import me.vilius.cerulean.repository.AuctionRepository;
 import me.vilius.cerulean.repository.BidRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StatusUpdateService {
@@ -35,21 +37,39 @@ public class StatusUpdateService {
     public void updateAuctionStatuses() {
         LocalDateTime now = LocalDateTime.now();
         List<Auction> expiredAuctions = auctionRepository.findByEndDateBeforeAndStatus(now, AuctionStatus.IN_PROGRESS);
+        List<Auction> buyItNowAuctions = auctionRepository.findAuctionsWithHighestBidMatchingBINPrice();
 
-        for (Auction auction : expiredAuctions) {
-            auction.setStatus(AuctionStatus.FINISHED);
-            // notify users the auction has ended
-            auction.getBids().forEach(bid ->
-                    notificationService.sendAuctionEndedNotification(bid.getBidder().getId(), auction.getId()));
-            // pay out the seller
-            Optional<Bid> highestBid = bidRepository.findTopByAuctionOrderByAmountDesc(auction);
-            if (highestBid.isPresent()) {
-                Bid highestBidObj = highestBid.get();
-                userService.updateBalance(auction.getSeller(), auction.getSeller()
-                        .getBalance().add(new BigDecimal(highestBidObj.getAmount())));
-            }
-            auctionRepository.save(auction);
+        List<Auction> auctionsToFinish = new java.util.ArrayList<>(expiredAuctions);
+        auctionsToFinish.addAll(buyItNowAuctions);
+
+        for (Auction auction : auctionsToFinish) {
+            finishAuction(auction);
         }
     }
 
+    private void finishAuction(Auction auction) {
+        auction.setEndDate(LocalDateTime.now()); // set end date (auction can also end by BIN)
+        auction.setStatus(AuctionStatus.FINISHED);
+
+        // notify bidders
+        List<User> uniqueBidders = auction.getBids().stream()
+                .map(Bid::getBidder)
+                .distinct()
+                .collect(Collectors.toList());
+
+        for (User bidder : uniqueBidders) {
+            notificationService.sendAuctionEndedNotification(bidder.getId(), auction.getId());
+        }
+
+        Optional<Bid> highestBid = bidRepository.findTopByAuctionOrderByAmountDesc(auction);
+
+        if (highestBid.isPresent()) {
+            Bid highestBidObj = highestBid.get();
+            // pay out to the seller
+            userService.updateBalance(auction.getSeller(), auction.getSeller()
+                    .getBalance().add(new BigDecimal(highestBidObj.getAmount())));
+        }
+
+        auctionRepository.save(auction);
+    }
 }
