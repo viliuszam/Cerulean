@@ -23,12 +23,10 @@ const WebSocketManager = {
       stompClient.connect(
         { Authorization: `Bearer ${token}` },
         (frame) => {
-          //console.log('Connected: ' + frame);
           isConnected = true;
           onConnected(stompClient);
           
           stompClient.subscribe('/user/topic/notifications', (notification) => {
-           // console.log('Received WebSocket notification:', notification);
             const parsedNotification = JSON.parse(notification.body);
             onMessageReceived(parsedNotification);
           });

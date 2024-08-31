@@ -23,6 +23,9 @@ public class PaymentService {
     private UserRepository userRepository;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private WithdrawalRequestRepository withdrawalRequestRepository;
 
     @Autowired
@@ -38,9 +41,9 @@ public class PaymentService {
         paymentRepository.save(payment);
 
         if (type == Payment.PaymentType.DEPOSIT) {
-            user.setBalance(user.getBalance().add(amount));
+            userService.updateBalance(user, user.getBalance().add(amount));
         } else if (type == Payment.PaymentType.REFUND) {
-            user.setBalance(user.getBalance().subtract(amount));
+            userService.updateBalance(user, user.getBalance().subtract(amount));
         }
         userRepository.save(user);
 
@@ -53,7 +56,7 @@ public class PaymentService {
         request.setAmount(amount);
         request.setRequestTime(LocalDateTime.now());
         request.setStatus(WithdrawalRequest.Status.PENDING);
-        user.setBalance(user.getBalance().subtract(request.getAmount()));
+        userService.updateBalance(user, user.getBalance().subtract(amount));
         userRepository.save(user);
         withdrawalRequestRepository.save(request);
 
@@ -90,7 +93,7 @@ public class PaymentService {
 
         User user = request.getUser();
         // refund the user to account balance if we deny withdrawal
-        user.setBalance(user.getBalance().add(request.getAmount()));
+        userService.updateBalance(user, user.getBalance().add(request.getAmount()));
         userRepository.save(user);
         request.setStatus(WithdrawalRequest.Status.DENIED);
         request.setAdminComment(comment);

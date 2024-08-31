@@ -7,7 +7,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const { connect, disconnect } = useWebSocket();
+    const { connect, disconnect, refreshUserData } = useWebSocket();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -16,30 +16,33 @@ export const AuthProvider = ({ children }) => {
                 headers: { Authorization: `Bearer ${token}` }
             }).then(response => {
                 setUser(response.data);
-                connect();
+                connect(); 
                 setLoading(false);
             }).catch(() => {
+                setUser(null);
                 setLoading(false);
             });
         } else {
             setLoading(false);
         }
-    }, []);
+    }, [connect]);
 
     const login = (token, userData) => {
         localStorage.setItem('token', token);
-        connect();
         setUser(userData);
+        connect();
+        refreshUserData();
     };
 
     const logout = () => {
         localStorage.removeItem('token');
-        disconnect();
         setUser(null);
+        disconnect();
+        window.dispatchEvent(new CustomEvent('userDataUpdated', { detail: { balance: 0 } }));
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, logout, setUser }}>
             {children}
         </AuthContext.Provider>
     );

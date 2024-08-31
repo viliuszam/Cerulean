@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { FaGavel, FaInfoCircle } from 'react-icons/fa';
+import { FaGavel, FaInfoCircle, FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
 const NotificationWrapper = styled.div`
   display: flex;
   align-items: center;
-  background-color: rgba(173, 216, 230, 0.8);
-  border: 1px solid #87CEFA;
+  background-color: ${props => props.$type === 'BALANCE_INCREMENT' ? 'rgba(144, 238, 144, 0.8)' : props.$type === 'BALANCE_DECREMENT' ? 'rgba(255, 99, 71, 0.8)' : 'rgba(173, 216, 230, 0.8)'};
+  border: 1px solid ${props => props.$type === 'BALANCE_INCREMENT' ? '#32CD32' : props.$type === 'BALANCE_DECREMENT' ? '#FF6347' : '#87CEFA'};
   border-radius: 8px;
   padding: 10px;
   margin-bottom: 10px;
@@ -80,13 +80,17 @@ const NotificationItem = ({ notification, onRemove }) => {
         return <FaGavel />;
       case 'AUCTION_ENDED':
         return <FaInfoCircle />;
+      case 'BALANCE_INCREMENT':
+        return <FaPlusCircle />;
+      case 'BALANCE_DECREMENT':
+        return <FaMinusCircle />;
       default:
-        return null;
+        return <FaInfoCircle />;
     }
   };
 
   return (
-    <NotificationWrapper $isExiting={isExiting} onClick={handleClick}>
+    <NotificationWrapper $type={notification.type} $isExiting={isExiting} onClick={handleClick}>
       <IconWrapper>{getIcon()}</IconWrapper>
       <NotificationContent>{notification.message}</NotificationContent>
     </NotificationWrapper>

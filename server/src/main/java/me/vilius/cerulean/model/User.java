@@ -54,7 +54,6 @@ public class User {
     @Column
     private String stripeAccountId;
 
-
     public String getStripeAccountId() {
         return stripeAccountId;
     }

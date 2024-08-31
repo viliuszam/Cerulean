@@ -97,8 +97,8 @@ public class StripeConnectController {
         Map<String, Object> accountLinkParams = new HashMap<>();
         accountLinkParams.put("account", accountId);
         // TODO: CHANGE THIS LATER
-        accountLinkParams.put("refresh_url", "http://localhost:3000/withdraw");
-        accountLinkParams.put("return_url", "http://localhost:3000/withdraw");
+        accountLinkParams.put("refresh_url", "http://localhost:3000/wallet");
+        accountLinkParams.put("return_url", "http://localhost:3000/wallet");
         accountLinkParams.put("type", "account_onboarding");
 
         try {

@@ -10,8 +10,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AuctionsIndexPage from './pages/AuctionsIndexPage';
 import MyBidsPage from './pages/MyBidsPage';
 import AuctionDetailPage from './pages/AuctionDetailPage';
-import DepositPage from './pages/DepositPage';
-import WithdrawalPage from './pages/WithdrawalPage';
 import AdminWithdrawalPage from './pages/AdminWithdrawalPage';
 import AdminRoute from './components/AdminRoute';
 import WalletPage from './pages/WalletPage';

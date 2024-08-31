@@ -3,7 +3,6 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import axios from 'axios';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import PageWithNavbar from '../components/PageWithNavbar';
 import './DepositPage.css';
 
 const stripePromise = loadStripe('pk_test_51PsSQHP4FN30HCPFJ5hCVYHtMliUx5NXEArkByiMGbWR00xeCSOe1o081MDyLiCr2bNMxsFRQlkc8eY3NvDKFn3800L8ISu5os');
@@ -41,7 +40,7 @@ const DepositForm = ({ onDepositSuccess }) => {
       } else {
         if (result.paymentIntent.status === 'succeeded') {
           setSuccessMessage('Deposit successful! Your balance has been updated.');
-          setTimeout(onDepositSuccess, 1500); // takes a sec for the webhook to update
+          setTimeout(onDepositSuccess, 2000); // takes a sec for the webhook to update
         }
       }
     } catch (error) {

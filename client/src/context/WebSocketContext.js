@@ -7,47 +7,47 @@ const WebSocketContext = createContext(null);
 export const WebSocketProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  const refreshAuctionData = useCallback(async (auctionId) => {
+  const refreshUserData = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8080/api/auctions/${auctionId}`, {
+      const response = await axios.get('http://localhost:8080/api/auth/user', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-     // console.log('Refreshed auction data:', response.data);
-      return response.data;
+      setCurrentUser(response.data);
+      // Dispatch a custom event when user data is updated
+      window.dispatchEvent(new CustomEvent('userDataUpdated', { detail: response.data }));
     } catch (error) {
-      console.error('Error refreshing auction data:', error);
+      console.error('Error refreshing user data:', error);
     }
   }, []);
 
   const addNotification = useCallback((newNotification) => {
-   // console.log('Received new notification:', newNotification);
     const id = Date.now();
     setNotifications((prevNotifications) => [
       ...prevNotifications,
       { ...newNotification, id, createdAt: Date.now() }
     ]);
 
+    if (newNotification.type === 'BALANCE_INCREMENT' || newNotification.type === 'BALANCE_DECREMENT') {
+      refreshUserData();
+    }
+
     if (newNotification.auctionId) {
-     // console.log('Dispatching auctionUpdate event for ID:', newNotification.auctionId);
       window.dispatchEvent(new CustomEvent('auctionUpdate', { detail: newNotification.auctionId.toString() }));
     }
-  }, []);
+  }, [refreshUserData]);
 
   const connect = useCallback(() => {
     const token = localStorage.getItem('token');
     if (!WebSocketManager.isConnected() && token) {
-     // console.log('Connecting to WebSocket');
       WebSocketManager.connect(
         token,
         addNotification,
-        () => {
-        //  console.log('WebSocket connection established.');
-          setIsConnected(true);
-        },
+        () => setIsConnected(true),
         (error) => console.error('WebSocket error:', error)
       ).catch(error => console.error('Connection failed:', error));
     }
@@ -57,7 +57,6 @@ export const WebSocketProvider = ({ children }) => {
     WebSocketManager.disconnect(() => {
       setNotifications([]);
       setIsConnected(false);
-    //  console.log('WebSocket connection terminated.');
     });
   }, []);
 
@@ -87,7 +86,7 @@ export const WebSocketProvider = ({ children }) => {
   }, [connect]);
 
   return (
-    <WebSocketContext.Provider value={{ notifications, isConnected, connect, disconnect, removeNotification, refreshAuctionData }}>
+    <WebSocketContext.Provider value={{ notifications, isConnected, currentUser, connect, disconnect, removeNotification, refreshUserData }}>
       {children}
     </WebSocketContext.Provider>
   );
