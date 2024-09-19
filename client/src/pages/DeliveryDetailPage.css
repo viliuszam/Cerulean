@@ -1,0 +1,206 @@
+.delivery-detail-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .delivery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .status-badge {
+    display: flex;
+    align-items: center;
+    background-color: #e9ecef;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+  }
+  
+  .status-badge svg {
+    margin-right: 5px;
+  }
+  
+  .tracking-info {
+    margin-bottom: 20px;
+  }
+  
+  .seller-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .seller-actions input,
+  .seller-actions select {
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+  }
+  
+  .confirm-delivery-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .confirm-delivery-btn:hover {
+    background-color: #218838;
+  }
+  
+  .chat-container {
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .message {
+    max-width: 70%;
+    margin-bottom: 10px;
+    clear: both;
+    overflow: hidden;
+  }
+  
+  .message.buyer {
+    float: right;
+  }
+  
+  .message.seller {
+    float: left;
+  }
+  
+  .message-content {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-radius: 20px;
+    display: inline-block;
+    max-width: 100%;
+    word-wrap: break-word;
+  }
+  
+  .message.seller .message-content {
+    background-color: #6c757d;
+  }
+  
+  .message.buyer .message-content {
+    float: right;
+  }
+  
+  .message-info {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+    clear: both;
+    text-align: right;
+  }
+  
+  .message.seller .message-info {
+    text-align: left;
+  }
+  .message-input {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .message-input input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+  }
+  
+  .message-input button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .message-input button:hover {
+    background-color: #0056b3;
+  }
+  
+  .rating-container {
+    margin-top: 20px;
+  }
+  
+  .star-rating {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .star-rating svg {
+    cursor: pointer;
+  }
+  
+  .rating-container textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  
+  .submit-rating-btn {
+    background-color: #ffc107;
+    color: #212529;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .submit-rating-btn:hover {
+    background-color: #e0a800;
+  }
+  
+  .loading,
+  .error,
+  .not-found {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 18px;
+  }
+  
+  .error {
+    color: #dc3545;
+  }
+
+  .websocket-status-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+  }
+  
+  .status-connected {
+    color: #28a745;
+  }
+  
+  .status-disconnected {
+    color: #dc3545;
+  }

@@ -18,7 +18,6 @@ export const WebSocketProvider = ({ children }) => {
         },
       });
       setCurrentUser(response.data);
-      // Dispatch a custom event when user data is updated
       window.dispatchEvent(new CustomEvent('userDataUpdated', { detail: response.data }));
     } catch (error) {
       console.error('Error refreshing user data:', error);
@@ -38,6 +37,10 @@ export const WebSocketProvider = ({ children }) => {
 
     if (newNotification.auctionId) {
       window.dispatchEvent(new CustomEvent('auctionUpdate', { detail: newNotification.auctionId.toString() }));
+    }
+
+    if (['DELIVERY_MESSAGE', 'DELIVERY_RATING', 'DELIVERY_STATUS_CHANGE'].includes(newNotification.type)) {
+      window.dispatchEvent(new CustomEvent('deliveryUpdate', { detail: newNotification }));
     }
   }, [refreshUserData]);
 

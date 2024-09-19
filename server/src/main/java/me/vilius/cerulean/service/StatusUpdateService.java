@@ -32,6 +32,10 @@ public class StatusUpdateService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private DeliveryService deliveryService;
+
+    // instead of doing it like this, maybe start using events, just something to look into
     @Scheduled(fixedRate = 15000)
     @Transactional
     public void updateAuctionStatuses() {
@@ -65,9 +69,14 @@ public class StatusUpdateService {
 
         if (highestBid.isPresent()) {
             Bid highestBidObj = highestBid.get();
+            auction.setBuyer(highestBidObj.getBidder());
             // pay out to the seller
             userService.updateBalance(auction.getSeller(), auction.getSeller()
                     .getBalance().add(new BigDecimal(highestBidObj.getAmount())));
+            auctionRepository.save(auction);
+
+            // create a delivery conversation between buyer and seller
+            deliveryService.createDelivery(auction);
         }
 
         auctionRepository.save(auction);

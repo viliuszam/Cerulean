@@ -2,6 +2,7 @@ package me.vilius.cerulean.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,8 +55,21 @@ public class Auction {
     @Column(name = "image_url")
     private List<String> imageUrls;
 
+    // note: this only gets set once the auction is finished (in status update service)
+    @ManyToOne
+    @JoinColumn(name = "buyer_id")
+    private User buyer;
+
     public Auction() {
         this.imageUrls = new ArrayList<>();
+    }
+
+    public User getBuyer() {
+        return buyer;
+    }
+
+    public void setBuyer(User buyer) {
+        this.buyer = buyer;
     }
 
     public Long getId() {

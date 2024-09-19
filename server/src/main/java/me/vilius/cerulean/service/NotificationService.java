@@ -39,4 +39,22 @@ public class NotificationService {
         NotificationMessage notificationMessage = new NotificationMessage(type, userId, null, message);
         messagingTemplate.convertAndSendToUser(userId.toString(), "/topic/notifications", notificationMessage);
     }
+
+    public void sendDeliveryMessageNotification(Long userId, Long deliveryId, String senderUsername) {
+        NotificationMessage message = new NotificationMessage("DELIVERY_MESSAGE", userId, deliveryId,
+                "New message from " + senderUsername + " in your delivery chat.");
+        messagingTemplate.convertAndSendToUser(userId.toString(), "/topic/notifications", message);
+    }
+
+    public void sendDeliveryRatingNotification(Long userId, Long deliveryId, int rating) {
+        NotificationMessage message = new NotificationMessage("DELIVERY_RATING", userId, deliveryId,
+                "You received a " + rating + "-star rating for your delivery.");
+        messagingTemplate.convertAndSendToUser(userId.toString(), "/topic/notifications", message);
+    }
+
+    public void sendDeliveryStatusChangeNotification(Long userId, Long deliveryId, String newStatus) {
+        NotificationMessage message = new NotificationMessage("DELIVERY_STATUS_CHANGE", userId, deliveryId,
+                "The status of your delivery has changed to: " + newStatus);
+        messagingTemplate.convertAndSendToUser(userId.toString(), "/topic/notifications", message);
+    }
 }

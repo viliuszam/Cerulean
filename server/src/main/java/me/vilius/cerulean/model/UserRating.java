@@ -1,5 +1,6 @@
 package me.vilius.cerulean.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,21 +11,24 @@ public class UserRating {
     private Long id;
 
     @Column(nullable = false)
-    private int rating; // e.g., 1 to 5 stars
+    private int rating; // 0 to 5 stars
 
     @Column(nullable = false)
     private String review;
 
     @ManyToOne
     @JoinColumn(name = "transaction_id", nullable = false)
+    @JsonIgnore
     private Auction transaction;
 
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
+    @JsonIgnore
     private User seller;
 
     @ManyToOne
     @JoinColumn(name = "buyer_id", nullable = false)
+    @JsonIgnore
     private User buyer;
 
 

@@ -9,6 +9,7 @@ import heartIcon from '@iconify/icons-mdi/heart';
 import cartIcon from '@iconify/icons-mdi/cart';
 import gavelIcon from '@iconify/icons-mdi/gavel';
 import walletIcon from '@iconify/icons-mdi/wallet';
+import truckIcon from '@iconify/icons-mdi/truck-cargo-container';
 import { AuthContext } from '../context/AuthContext';
 import { useWebSocket } from '../context/WebSocketContext';
 
@@ -146,6 +147,10 @@ const Navbar = () => {
         <NavItem to="/wallet">
           <Icon icon={walletIcon} width="24" height="24" />
           Wallet
+        </NavItem>
+        <NavItem to="/delivery">
+          <Icon icon={truckIcon} width="24" height="24" />
+          Delivery
         </NavItem>
       </NavLeft>
       <NavRight>

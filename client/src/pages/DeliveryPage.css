@@ -1,0 +1,81 @@
+.delivery-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0px 0;
+  }
+  
+  .tab-labels {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .tab-label {
+    padding: 10px 20px;
+    margin: 0 10px;
+    cursor: pointer;
+    color: #333;
+    font-size: 16px;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+  
+  .tab-label.active {
+    border-bottom: 2px solid #007bff;
+    color: #007bff;
+    font-weight: bold;
+  }
+  
+  .tab-label:not(.active) {
+    border-bottom: 2px solid #ccc;
+    color: #666;
+  }
+  
+  .tab-content {
+    padding: 20px;
+  }
+  
+  .delivery-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .delivery-table th,
+  .delivery-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .delivery-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
+  .delivery-table tr:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .status-badge.pending {
+    background-color: #ffd700;
+    color: #000;
+  }
+  
+  .status-badge.in_transit {
+    background-color: #1e90ff;
+    color: #fff;
+  }
+  
+  .status-badge.delivered {
+    background-color: #32cd32;
+    color: #fff;
+  }
