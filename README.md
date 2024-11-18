@@ -4,7 +4,7 @@
   <img alt="cerulean logo" src="/assets/cerulean_logo.png">
 </picture>
 
-A web application designed with quick exchanges and ease of use in mind.
+An auction web application designed with quick exchanges and ease of use in mind.
 
 [![Java](https://img.shields.io/badge/Java-%23ED8B00.svg?logo=openjdk&logoColor=white)](#)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000)](#)
