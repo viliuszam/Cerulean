@@ -29,13 +29,27 @@ A web application designed with quick exchanges and ease of use in mind.
 ## User flows
 <div align="center">
 
-| https://github.com/user-attachments/assets/b30ab3b1-aee5-4f96-a368-d9f80e211485 | 
-|:--:| 
-| *Stripe deposit experience* |
+https://github.com/user-attachments/assets/b30ab3b1-aee5-4f96-a368-d9f80e211485
 
+*Stripe deposit example*
 
+https://github.com/user-attachments/assets/6207e904-afca-418c-b1ae-56370d7cef6a
 
+*Stripe Connect, Withdrawal example*
+
+https://github.com/user-attachments/assets/1b46f6b2-8981-411c-8276-bd0077ef6d9b
+
+*Example of a bidding war, an auction ending*
+
+https://github.com/user-attachments/assets/5d7a7882-719f-46f9-abdf-19581913cd80
+
+*Delivery conversation example*
 
 </div>
 
 ## Roadmap
+
+- Refund policies, conflict resolution center.
+- Delivery tracking integration (DHL, Omniva APIs, others..)
+- User product suggestions
+- Performance and health measurement, telemetry (Grafana, Prometheus)
