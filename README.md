@@ -27,23 +27,29 @@ A web application designed with quick exchanges and ease of use in mind.
 - Buyer and Seller delivery communication system.
 
 ## User flows
-<div align="center">
+<div align="center" style="margin-bottom: 20px;">
 
-https://github.com/user-attachments/assets/b30ab3b1-aee5-4f96-a368-d9f80e211485
+### Stripe Deposit Example
 
-*Stripe deposit example*
+https://github.com/user-attachments/assets/b30ab3b1-aee5-4f96-a368-d9f80e211485  
 
-https://github.com/user-attachments/assets/6207e904-afca-418c-b1ae-56370d7cef6a
+---
 
-*Stripe Connect, Withdrawal example*
+### Stripe Connect, Withdrawal Example
 
-https://github.com/user-attachments/assets/1b46f6b2-8981-411c-8276-bd0077ef6d9b
+https://github.com/user-attachments/assets/6207e904-afca-418c-b1ae-56370d7cef6a  
 
-*Example of a bidding war, an auction ending*
+---
 
-https://github.com/user-attachments/assets/5d7a7882-719f-46f9-abdf-19581913cd80
+### Bidding War and Auction Ending
 
-*Delivery conversation example*
+https://github.com/user-attachments/assets/1b46f6b2-8981-411c-8276-bd0077ef6d9b  
+
+---
+
+### Delivery Conversation Example
+
+https://github.com/user-attachments/assets/5d7a7882-719f-46f9-abdf-19581913cd80  
 
 </div>
 
